@@ -1,5 +1,12 @@
 from flask import Flask, render_template, request, redirect, session
 import sqlite3
+import os
+
+db_folder = "db"
+if not os.path.exists(db_folder):
+    os.makedirs(db_folder)
+
+con = sqlite3.connect(f"{db_folder}/student.db")
 
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  
