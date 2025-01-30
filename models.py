@@ -1,15 +1,12 @@
 import sqlite3
 import os
 
-# Database paths
 STUDENT_DB = "db/students.db"
 CREDITS_DB = "db/credits.db"
-GRADES_DB = "db/student_grades.db"  # New Database for Storing Student Grades
+GRADES_DB = "db/student_grades.db" 
 
-# Ensure 'db' directory exists
 os.makedirs("db", exist_ok=True)
 
-# Create Student Table
 def create_student_table():
     conn = sqlite3.connect(STUDENT_DB)
     cursor = conn.cursor()
@@ -26,7 +23,6 @@ def create_student_table():
     conn.commit()
     conn.close()
 
-# Insert Default Students
 def insert_default_students():
     students_data = [
         ("Aung Kaung Bo", "HSBKK1001", "Computer Science", "44/180", "8 Feb 2023", "27 March 2027"),
@@ -43,7 +39,6 @@ def insert_default_students():
     conn.commit()
     conn.close()
 
-# Create Credits Table
 def create_credits_table():
     conn = sqlite3.connect(CREDITS_DB)
     cursor = conn.cursor()
@@ -61,7 +56,6 @@ def create_credits_table():
     conn.commit()
     conn.close()
 
-# Insert Default Credits
 def insert_default_credits():
     credits_data = [
         ("HSBKK1001", 12, 4, 8, 10, 0),
@@ -78,7 +72,6 @@ def insert_default_credits():
     conn.commit()
     conn.close()
 
-# ✅ Step 1: Create Student Grades Table
 def create_student_grades_table():
     conn = sqlite3.connect(GRADES_DB)
     cursor = conn.cursor()
@@ -94,7 +87,6 @@ def create_student_grades_table():
     conn.commit()
     conn.close()
 
-# ✅ Step 2: Insert Student Grades
 def insert_student_grade(student_id, major, module_name, grade):
     conn = sqlite3.connect(GRADES_DB)
     cursor = conn.cursor()
@@ -105,7 +97,6 @@ def insert_student_grade(student_id, major, module_name, grade):
     conn.commit()
     conn.close()
 
-# ✅ Step 3: Get Grades for a Student
 def get_student_grades(student_id):
     conn = sqlite3.connect(GRADES_DB)
     cursor = conn.cursor()
@@ -114,18 +105,17 @@ def get_student_grades(student_id):
     grades = cursor.fetchall()
     
     conn.close()
-    return grades  # Returns a list of (module_name, grade) tuples
+    return grades 
 
-# ✅ Step 4: Insert Sample Grades
 def insert_sample_grades():
     sample_grades = [
         ("HSBKK1001", "Computer Science", "Intro to Python Programming - Part 1", 90),
-        ("HSBKK1001", "Computer Science", "Zero to Hero Module", 85),
-        ("HSBKK1001", "Computer Science", "Growth Marketing for Startups", 75),
-        ("HSBKK1002", "Computer Science", "Business Innovation Module", 88),
-        ("HSBKK1002", "Computer Science", "AI & Machine Learning", 92),
-        ("HSBKK1003", "Computer Science", "Web Development Bootcamp", 78),
-        ("HSBKK1003", "Computer Science", "Cloud Computing Basics", 83)
+        ("HSBKK1001", "High Tech Entrepreneurship", "Zero to Hero Module", 85),
+        ("HSBKK1001", "Digital Marketing", "Growth Marketing for Startups", 75),
+        ("HSBKK1001", "Interaction Design", "Business Innovation Module", 88),
+        ("HSBKK1001", "Data Science", "AI & Machine Learning", 92),
+        ("HSBKK1001", "Computer Science", "Web Development Bootcamp", 78),
+        ("HSBKK1001", "Computer Science", "Cloud Computing Basics", 83)
     ]
 
     conn = sqlite3.connect(GRADES_DB)
@@ -137,7 +127,6 @@ def insert_sample_grades():
     conn.commit()
     conn.close()
 
-# Run all setup functions
 create_student_table()
 insert_default_students()
 create_credits_table()
