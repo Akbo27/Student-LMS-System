@@ -4,17 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
+    <style>
+        .progress-bar {
+            width: 100%;
+            background-color: #ddd;
+        }
+        .progress {
+            width: 70%;
+            height: 20px;
+            background-color: #4CAF50;
+            text-align: center;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard</title>
-</head>
-<body>
-    <h1>HS Student Dashboard</h1>
-    <h2>Welcome, {{ name }}!</h2>      
+    <h2>Welcome, {{ name }}!</h2>
+    <p>Student ID: {{ student_id }}</p>
+    <p>Major: {{ major }}</p>
+    <p>Earned ECTs: {{ earned_ects }}</p>
+    <p>Current GPA: {{ gpa }}/4.0</p>
+    <p>Entry Date: {{ entry_date }}</p>
+    <p>Graduation Date: {{ graduation_date }}</p>
+
+    <h3>Current Course: Python 3</h3>
+    <div class="progress-bar">
+        <div class="progress">70%</div>
+    </div>
+
+    <h3>Credits Earned by Major:</h3>
+    <img src="{{ pie_chart }}" alt="Pie Chart of Earned Credits">
+
+    <br><br>
+    <a href="/logout">Logout</a>
 </body>
 </html>
