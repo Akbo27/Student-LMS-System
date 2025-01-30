@@ -1,87 +1,79 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
-import os
 import matplotlib.pyplot as plt
+import os
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"  
+app.secret_key = 'supersecretkey'
 
-if not os.path.exists('static'):
-    os.makedirs('static')
+STUDENT_DB = "db/students.db"
+CREDITS_DB = "db/credits.db"
 
-DB_PATH = "db/student.db"  
-
-def check_student(name, student_id):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM students WHERE name=? AND student_id=?", (name, student_id))
-    student = cursor.fetchone()
-    conn.close()
-    return student
-
-def get_student_data(student_id):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-    cursor.execute("SELECT name, major, earned_ects, gpa, entry_date, graduation_date FROM students WHERE student_id=?", (student_id,))
-    student = cursor.fetchone()
-    conn.close()
-    return student 
-
-def generate_pie_chart(student_id):
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    credits_by_major = {
-        "Computer Science": 12,
-        "Interaction Design": 20,
-        "Data Science": 8,
-        "Digital Marketing": 4
-    }
-
-    labels = list(credits_by_major.keys())
-    sizes = list(credits_by_major.values())
-
-    plt.figure(figsize=(5, 5))
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, colors=['#ff9999', '#66b3ff', '#99ff99', '#ffcc99'])
-    plt.axis('equal')  
-    pie_path = "static/pie_chart.png"
-    plt.savefig(pie_path)
-    conn.close()
-    return pie_path
+if not os.path.exists("static"):
+    os.makedirs("static")
 
 @app.route("/", methods=["GET", "POST"])
 def login():
+    error = None
     if request.method == "POST":
-        name = request.form["name"]
+        name = request.form["name"] 
         student_id = request.form["student_id"]
 
-        student = check_student(name, student_id)
+        conn = sqlite3.connect(STUDENT_DB)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM students WHERE name = ? AND student_id = ?", (name, student_id))
+        student = cursor.fetchone()
+        conn.close()
 
         if student:
-            session["student_id"] = student[2] 
-            return redirect("/dashboard")
+            session["student_id"] = student_id
+            return redirect(url_for("dashboard"))
         else:
-            return render_template("login.html", error="Invalid name or student ID")
+            error = "Invalid credentials. Please try again."
 
-    return render_template("login.html")
+    return render_template("login.html", error=error)
 
 @app.route("/dashboard")
 def dashboard():
-    if "student_id" in session:
-        student_id = session["student_id"]
-        student = get_student_data(student_id)
+    if "student_id" not in session:
+        return redirect(url_for("login"))
 
-        if student:
-            pie_chart_path = generate_pie_chart(student_id)
-            return render_template("dashboard.html", name=student[0], major=student[1], earned_ects=student[2], 
-                                   gpa=student[3], entry_date=student[4], graduation_date=student[5], 
-                                   pie_chart=pie_chart_path)
-    return redirect("/")
+    student_id = session["student_id"]
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
+    conn = sqlite3.connect(STUDENT_DB)
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, major, credits_earned, entry_date, graduation_date FROM students WHERE student_id = ?", (student_id,))
+    student = cursor.fetchone()
+    conn.close()
+
+    if not student:
+        return redirect(url_for("login"))
+
+    name, major, credits_earned, entry_date, graduation_date = student
+
+    conn = sqlite3.connect(CREDITS_DB)
+    cursor = conn.cursor()
+    cursor.execute("SELECT computer_science, data_science, interaction_design, high_tech_entrepreneurship, digital_marketing FROM credits WHERE student_id = ?", (student_id,))
+    credits = cursor.fetchone()
+    conn.close()
+
+    pie_chart_path = None
+    if credits:
+        credit_labels = ["CS", "DS", "ID", "HTE", "DM"]
+        credit_values = list(credits)
+
+        plt.figure(figsize=(6, 6))
+        plt.pie(credit_values, labels=credit_labels, autopct="%1.1f%%", 
+                colors=["#ff9999","#66b3ff","#99ff99","#ffcc99","#c2c2f0"])
+        plt.title(f"{name}'s Credit Distribution")
+        
+        pie_chart_path = f"static/pie_chart_{student_id}.png"
+        plt.savefig(pie_chart_path)
+        plt.close()
+
+    return render_template("dashboard.html", name=name, major=major, credits_earned=credits_earned,
+                           entry_date=entry_date, graduation_date=graduation_date, 
+                           credit_values=credits, student_id=student_id, pie_chart=pie_chart_path)
 
 if __name__ == "__main__":
     app.run(debug=True)
