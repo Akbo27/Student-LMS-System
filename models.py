@@ -1,7 +1,10 @@
 import sqlite3
 import os
 
-conn = sqlite3.connect("student.db")
+if not os.path.exists("db"):
+    os.makedirs("db")
+
+conn = sqlite3.connect("db/student.db")
 cursor = conn.cursor()
 
 cursor.execute('''
@@ -13,18 +16,20 @@ cursor.execute('''
     )
 ''')
 
-students_data = [
-    ("Aung Kaung Bo", "HSBKK1001", "Computer Science"),
-    ("Sai Khay Khun Mong", "HSBKK1002", "Computer Science"),
-    ("Nyein Chan Soe", "HSBKK1003", "Computer Science"),
-    ("Tom Everson", "HSBKK1004", "Data Science"),
-    ("Phone Myint Myat", "HSBKK1005", "Digital Marketing"),
-    ("Yang Paing Aung", "HSBKK1006", "Interaction Design"),
-    ("Min Myat Swan Pyae", "HSBKK1007", "High Tech Entrepreneurship")
-]
+def insert_default_students():
+    students_data = [
+        ("Aung Kaung Bo", "HSBKK1001", "Computer Science"),
+        ("Sai Khay Khun Mong", "HSBKK1002", "Computer Science"),
+        ("Nyein Chan Soe", "HSBKK1003", "Computer Science"),
+        ("Tom Everson", "HSBKK1004", "Data Science"),
+        ("Phone Myint Myat", "HSBKK1005", "Digital Marketing"),
+        ("Yang Paing Aung", "HSBKK1006", "Interaction Design"),
+        ("Min Myat Swan Pyae", "HSBKK1007", "High Tech Entrepreneurship")
+    ]
 
-cursor.executemany("INSERT OR IGNORE INTO students (name, student_id, major) VALUES (?, ?, ?)", students_data)
+    cursor.executemany("INSERT OR IGNORE INTO students (name, student_id, major) VALUES (?, ?, ?)", students_data)
+    conn.commit()
 
-conn.commit()
+insert_default_students()
+
 conn.close()
-

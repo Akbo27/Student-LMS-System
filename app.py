@@ -2,17 +2,12 @@ from flask import Flask, render_template, request, redirect, session
 import sqlite3
 import os
 
-db_folder = "db"
-if not os.path.exists(db_folder):
-    os.makedirs(db_folder)
-
-con = sqlite3.connect(f"{db_folder}/student.db")
-
 app = Flask(__name__)
 app.secret_key = "your_secret_key"  
+DB_PATH = "db/student.db" 
 
 def check_student(name, student_id):
-    conn = sqlite3.connect("student.db")
+    conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM students WHERE name=? AND student_id=?", (name, student_id))
     student = cursor.fetchone()
@@ -28,8 +23,9 @@ def login():
         student = check_student(name, student_id)
 
         if student:
-            session["name"] = name
-            session["student_id"] = student_id
+            session["name"] = student[1]  
+            session["student_id"] = student[2]  
+            session["major"] = student[3]  
             return redirect("/dashboard")  
         else:
             return render_template("login.html", error="Invalid name or student ID")
@@ -39,7 +35,7 @@ def login():
 @app.route("/dashboard")
 def dashboard():
     if "name" in session:
-        return render_template("dashboard.html", name=session["name"], student_id=session["student_id"])
+        return render_template("dashboard.html", name=session["name"], student_id=session["student_id"], major=session["major"])
     else:
         return redirect("/")
 
