@@ -1,16 +1,20 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
 import matplotlib.pyplot as plt
 import os
+from aihandler import LLMInterface
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 STUDENT_DB = "db/students.db"
 CREDITS_DB = "db/credits.db"
+GRADES_DB = "db/student_grades.db"
 
 if not os.path.exists("static"):
     os.makedirs("static")
+
+llm = LLMInterface()
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -32,6 +36,15 @@ def login():
             error = "Invalid credentials. Please try again."
 
     return render_template("login.html", error=error)
+
+def get_student_grades(student_id):
+    conn = sqlite3.connect(GRADES_DB)
+    cursor = conn.cursor()
+    cursor.execute("SELECT module_name, grade FROM student_grades WHERE student_id = ?", (student_id,))
+    grades = cursor.fetchall()
+    conn.close()
+    
+    return grades
 
 @app.route("/dashboard")
 def dashboard():
@@ -71,9 +84,15 @@ def dashboard():
         plt.savefig(pie_chart_path)
         plt.close()
 
+    grades = get_student_grades(student_id)
+    grade_summary = "\n".join([f"{module}: {grade}" for module, grade in grades])
+    
+    ai_insights = llm.generate_response(grade_summary) if grades else "No academic records found."
+
     return render_template("dashboard.html", name=name, major=major, credits_earned=credits_earned,
                            entry_date=entry_date, graduation_date=graduation_date, 
-                           credit_values=credits, student_id=student_id, pie_chart=pie_chart_path)
+                           credit_values=credits, student_id=student_id, pie_chart=pie_chart_path,
+                           ai_insights=ai_insights)
 
 if __name__ == "__main__":
     app.run(debug=True)
