@@ -4,38 +4,129 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard</title>
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Rubik Font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        .progress-bar {
-            width: 100%;
-            background-color: #ddd;
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .dashboard-header {
+            background-color: #685DC5;
+            color: white;
+            padding: 2rem;
+            border-radius: 0 0 20px 20px;
+        }
+        .dashboard-header h1 {
+            font-weight: 700;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .progress {
-            width: 70%;
             height: 20px;
-            background-color: #4CAF50;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            background-color: #685DC5;
+        }
+        .visual-container {
             text-align: center;
-            color: white;
+            margin: 2rem 0;
+        }
+        .visual-container img {
+            max-width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card h3 {
+            color: #685DC5;
+            font-weight: 700;
         }
     </style>
 </head>
 <body>
-    <h2>Welcome, {{ name }}!</h2>
-    <p>Student ID: {{ student_id }}</p>
-    <p>Major: {{ major }}</p>
-    <p>Earned ECTs: {{ earned_ects }}</p>
-    <p>Current GPA: {{ gpa }}/4.0</p>
-    <p>Entry Date: {{ entry_date }}</p>
-    <p>Graduation Date: {{ graduation_date }}</p>
-
-    <h3>Current Course: Python 3</h3>
-    <div class="progress-bar">
-        <div class="progress">70%</div>
+    <!-- Dashboard Header -->
+    <div class="dashboard-header text-center">
+        <h1>Welcome, {{ name }}!</h1>
+        <p class="lead">Student ID: {{ student_id }}</p>
     </div>
 
-    <h3>Credits Earned by Major:</h3>
-    <img src="{{ pie_chart }}" alt="Pie Chart of Earned Credits">
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row">
+            <!-- Student Details Card -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-4">
+                    <h3 class="card-title">Student Details</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Major:</strong> {{ major }}</li>
+                        <li class="list-group-item"><strong>Earned ECTs:</strong> {{ earned_ects }}</li>
+                        <li class="list-group-item"><strong>Current GPA:</strong> {{ gpa }}/4.0</li>
+                        <li class="list-group-item"><strong>Entry Date:</strong> {{ entry_date }}</li>
+                        <li class="list-group-item"><strong>Graduation Date:</strong> {{ graduation_date }}</li>
+                    </ul>
+                </div>
+            </div>
 
-    <br><br>
-    <a href="/logout">Logout</a>
+            <!-- Current Course Progress Card -->
+            <div class="col-md-6 mb-4">
+                <div class="card p-4">
+                    <h3 class="card-title">Current Course: Python 3</h3>
+                    <div class="progress mt-3">
+                        <div class="progress-bar" style="width: 70%;">70%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <h3>Completed Courses</h3>
+                    <p class="display-4">12</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <h3>Ongoing Courses</h3>
+                    <p class="display-4">3</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="stat-card">
+                    <h3>Remaining ECTs</h3>
+                    <p class="display-4">48</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credits Earned Visual -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card p-4">
+                    <h3 class="card-title">Credits Earned by Major</h3>
+                    <div class="visual-container">
+                        <img src="{{ pie_chart }}" alt="Pie Chart of Earned Credits">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
