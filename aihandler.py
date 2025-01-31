@@ -24,11 +24,12 @@ class LLMInterface:
         """
 
         try:
-            response = self.client.create(
+            response = self.client.chat.complete(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}]
             )
-            return response["choices"][0]["message"]["content"]
 
+            return response.choices[0].message.content
+        
         except Exception as e:
             return f"Error: Failed to fetch AI response. ({str(e)})"
