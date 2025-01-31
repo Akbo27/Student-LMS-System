@@ -20,14 +20,16 @@ llm = LLMInterface()
 def login():
     error = None
     if request.method == "POST":
-        name = request.form["name"] 
+        name = request.form["name"]
         student_id = request.form["student_id"]
+
 
         conn = sqlite3.connect(STUDENT_DB)
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM students WHERE name = ? AND student_id = ?", (name, student_id))
         student = cursor.fetchone()
         conn.close()
+
 
         if student:
             session["student_id"] = student_id
@@ -43,7 +45,7 @@ def get_student_grades(student_id):
     cursor.execute("SELECT module_name, grade FROM student_grades WHERE student_id = ?", (student_id,))
     grades = cursor.fetchall()
     conn.close()
-    
+   
     return grades
 
 @app.route("/dashboard")
@@ -75,22 +77,24 @@ def dashboard():
         credit_labels = ["CS", "DS", "ID", "HTE", "DM"]
         credit_values = list(credits)
 
+
         plt.figure(figsize=(6, 6))
-        plt.pie(credit_values, labels=credit_labels, autopct="%1.1f%%", 
+        plt.pie(credit_values, labels=credit_labels, autopct="%1.1f%%",
                 colors=["#ff9999","#66b3ff","#99ff99","#ffcc99","#c2c2f0"])
         plt.title(f"{name}'s Credit Distribution")
-        
+       
         pie_chart_path = f"static/pie_chart_{student_id}.png"
         plt.savefig(pie_chart_path)
         plt.close()
 
     grades = get_student_grades(student_id)
     grade_summary = "\n".join([f"{module}: {grade}" for module, grade in grades])
-    
+   
     ai_insights = llm.generate_response(grade_summary) if grades else "No academic records found."
 
+
     return render_template("dashboard.html", name=name, major=major, credits_earned=credits_earned,
-                           entry_date=entry_date, graduation_date=graduation_date, 
+                           entry_date=entry_date, graduation_date=graduation_date,
                            credit_values=credits, student_id=student_id, pie_chart=pie_chart_path,
                            ai_insights=ai_insights)
 
