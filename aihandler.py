@@ -18,19 +18,16 @@ class LLMInterface:
         prompt = f"""
         The following are the academic grades of a student across various modules:
 
-
         {grades_data}
-
 
         Provide insights and suggest areas for improvement.
         """
-        
+            
         try:
             response = self.client.chat.complete(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}]
             )
-
 
             return response.choices[0].message.content
        
